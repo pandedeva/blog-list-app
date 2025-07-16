@@ -27,7 +27,7 @@ export const fetchBlog = async (): Promise<Blog[]> => {
 // buat blog baru
 export const createBlog = async (blog: Blog): Promise<void> => {
   try {
-    const reponse = await fetch(`${BASE_URL}/blogs`, {
+    const response = await fetch(`${BASE_URL}/blogs`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -35,7 +35,7 @@ export const createBlog = async (blog: Blog): Promise<void> => {
       body: JSON.stringify(blog),
     });
 
-    await validation(reponse);
+    await validation(response);
   } catch (error) {
     console.log("error ", error);
     throw new Error("Failed to create blog");
@@ -64,5 +64,23 @@ export const deleteBlog = async (id: string): Promise<void> => {
   } catch (error) {
     console.log("error ", error);
     throw new Error("Failed to delete blog");
+  }
+};
+
+// edit blog
+export const updateBlog = async (id: string, blog: Blog): Promise<void> => {
+  try {
+    const response = await fetch(`${BASE_URL}/blogs/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(blog),
+    });
+
+    await validation(response);
+  } catch (error) {
+    console.log("error ", error);
+    throw new Error("Failed to update blog");
   }
 };

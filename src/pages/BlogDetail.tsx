@@ -82,7 +82,10 @@ const BlogDetail = () => {
               </p>
             </div>
 
-            <div className="flex gap-4 mt-6">
+            <div
+              className="flex gap-4 mt-6"
+              onClick={() => navigate(`/blog/${id}/edit`)}
+            >
               <button className="bg-green-700 hover:bg-green-700/90 text-gray-100 font-medium px-4 py-2 rounded shadow transition duration-300 ease-in-out cursor-pointer">
                 Edit
               </button>

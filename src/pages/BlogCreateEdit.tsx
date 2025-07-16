@@ -5,8 +5,7 @@ import { blogSchema } from "../utils/validation";
 import type { Blog } from "../types/Blog";
 import { useEffect } from "react";
 import Layout from "../components/Layout";
-import { uuidv4 } from "zod";
-import { createBlog } from "../api/blogApi";
+import { createBlog, fetchOneBlog, updateBlog } from "../api/blogApi";
 import { toast } from "react-toastify";
 
 type Props = {
@@ -26,7 +25,24 @@ const BlogCreateEdit = ({ mode }: Props) => {
 
   useEffect(() => {
     // todo untuk edit
-  }, []);
+    const getBlog = async () => {
+      if (id && mode === "edit") {
+        try {
+          const data = await fetchOneBlog(id);
+          setValue("title", data.title);
+          setValue("description", data.description);
+          setValue("image", data.image);
+          setValue("createdAt", data.createdAt);
+        } catch (error) {
+          toast.error("Failed to fetch blog");
+          console.log("error ", error);
+          navigate("/");
+        }
+      }
+    };
+
+    getBlog();
+  }, [id, mode, navigate, setValue]);
 
   const onSubmit = async (data: Blog) => {
     try {
@@ -39,11 +55,16 @@ const BlogCreateEdit = ({ mode }: Props) => {
         await createBlog(newBlog);
         navigate("/");
         toast.success("Blog created successfully");
+      } else if (mode === "edit" && id) {
+        await updateBlog(id, data);
+        toast.success("Blog updated successfully");
+        navigate("/");
       }
     } catch (error) {
-      toast.error("Failed to create blog");
+      toast.error(
+        mode === "create" ? "Failed to create blog" : "Failed to update blog"
+      );
       console.log("error ", error);
-      throw new Error("Failed to create blog");
     }
   };
 
@@ -73,10 +94,10 @@ const BlogCreateEdit = ({ mode }: Props) => {
             )}
           </div>
 
-          {/* Desciption */}
+          {/* Description */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Desciption
+              Description
             </label>
             <input
               type="text"
@@ -108,7 +129,7 @@ const BlogCreateEdit = ({ mode }: Props) => {
           {/* submit button */}
           <button
             type="submit"
-            className="bg-[#F28705] text-gray-900 px-6 py-2 rounded font-semibold cursor-pointer hover:bg-[#F28705]/80 transition duration-300 mt-2 w-1/5 self-end"
+            className="bg-[#F28705] text-gray-900 px-6 py-2 rounded font-semibold cursor-pointer hover:bg-[#F28705]/80 transition duration-300 mt-2 w-1/4 self-end"
           >
             {mode === "create" ? "Create" : "Save Changes"}
           </button>
