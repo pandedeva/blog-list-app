@@ -53,3 +53,16 @@ export const fetchOneBlog = async (id: string): Promise<Blog> => {
     throw new Error("Failed to fetch blogs");
   }
 };
+
+// delete blog berdasarkan ID
+export const deleteBlog = async (id: string): Promise<void> => {
+  try {
+    const response = await fetch(`${BASE_URL}/blogs/${id}`, {
+      method: "DELETE",
+    });
+    await validation(response);
+  } catch (error) {
+    console.log("error ", error);
+    throw new Error("Failed to delete blog");
+  }
+};

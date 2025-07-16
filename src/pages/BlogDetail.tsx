@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import type { Blog } from "../types/Blog";
-import { fetchOneBlog } from "../api/blogApi";
+import { deleteBlog, fetchOneBlog } from "../api/blogApi";
 import { toast } from "react-toastify";
 import Layout from "../components/Layout";
 import BlogDetailSkeleton from "../components/BlogDetailSkeleton";
+import Modal from "../components/Modal";
 
 const BlogDetail = () => {
   const { id } = useParams();
@@ -30,21 +31,35 @@ const BlogDetail = () => {
     getBlog();
   }, [id, navigate]);
 
+  const handleDelete = async () => {
+    if (id) {
+      try {
+        await deleteBlog(id);
+        toast.success("Blog deleted successfully");
+        navigate("/");
+      } catch (error) {
+        setIsModalOpen(false);
+        toast.error("Failed to delete blog");
+        console.log("error ", error);
+      }
+    }
+  };
+
   return (
     <>
       <Layout>
         {/* header navigation */}
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-2xl text-[#F28705] font-bold border-b-2 border-gray-700 pb-2">
-            Blog Detail
-          </h1>
-
           <button
             className="bg-[#F28705] hover:bg-[#F28705]/90 font-bold py-2 px-4 rounded text-slate-900 transition duration-300 ease-in-out shadow cursor-pointer"
             onClick={() => navigate("/")}
           >
             Back to Blog List
           </button>
+
+          <h1 className="text-2xl text-[#F28705] font-bold border-b-2 border-gray-700 pb-2">
+            Blog Detail
+          </h1>
         </div>
 
         {/* blog content */}
@@ -71,7 +86,11 @@ const BlogDetail = () => {
               <button className="bg-green-700 hover:bg-green-700/90 text-gray-100 font-medium px-4 py-2 rounded shadow transition duration-300 ease-in-out cursor-pointer">
                 Edit
               </button>
-              <button className="bg-red-700 hover:bg-red-700/90 text-gray-100 font-medium px-4 py-2 rounded shadow transition duration-300 ease-in-out cursor-pointer">
+
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="bg-red-700 hover:bg-red-700/90 text-gray-100 font-medium px-4 py-2 rounded shadow transition duration-300 ease-in-out cursor-pointer"
+              >
                 Delete
               </button>
             </div>
@@ -79,6 +98,14 @@ const BlogDetail = () => {
         ) : (
           <BlogDetailSkeleton />
         )}
+
+        <Modal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onConfirm={handleDelete}
+          title="Delete Blog"
+          desciption="Are you sure you want to delete this blog?"
+        />
       </Layout>
     </>
   );
